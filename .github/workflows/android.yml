@@ -1,0 +1,46 @@
+
+name: Stellwerk Emden APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Projekt herunterladen
+        uses: actions/checkout@v4
+
+      - name: Java einrichten
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Gradle einrichten
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: ZIP entpacken
+        run: |
+          mkdir -p projekt
+          ZIP=$(find . -maxdepth 1 -name '*.zip' -print -quit)
+          test -n "$ZIP"
+          unzip -q "$ZIP" -d projekt
+
+      - name: APK bauen
+        run: |
+          PROJECT=$(find projekt -name settings.gradle -print -quit)
+          test -n "$PROJECT"
+          cd "$(dirname "$PROJECT")"
+          gradle assembleDebug --no-daemon
+
+      - name: APK bereitstellen
+        uses: actions/upload-artifact@v4
+        with:
+          name: Stellwerk-Emden-Hbf-APK
+          path: projekt/**/build/outputs/apk/debug/*.apk
