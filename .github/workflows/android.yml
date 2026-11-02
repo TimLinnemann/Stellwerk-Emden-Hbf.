@@ -28,7 +28,7 @@ jobs:
       - name: ZIP entpacken
         run: |
           mkdir -p projekt
-          ZIP=$(find . -maxdepth 1 -name '*.zip' -print -quit)
+          ZIP="Stellwerk_Emden_Hbf_Gleisplan_V2.zip"
           test -n "$ZIP"
           unzip -q "$ZIP" -d projekt
 
